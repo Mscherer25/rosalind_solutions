@@ -28,7 +28,7 @@ def count_dna_nucleotides(dna: str):
 
     # RNA – Transcribing DNA into RNA
 # Problem ID: RNA
-def dna_to_rna(dna: str) -> str:
+def dna_to_rna(dna: str) -- str:
     """
     Rosalind 'RNA' – Transcribing DNA into RNA
 
@@ -43,7 +43,7 @@ def dna_to_rna(dna: str) -> str:
 
 # REVC – Complementing a Strand of DNA
 # Problem ID: REVC
-def reverse_complement(dna: str) -> str:
+def reverse_complement(dna: str) -- str:
     """
     Rosalind 'REVC' – Complementing a Strand of DNA
 
@@ -129,7 +129,7 @@ def max_gc_content(fasta_str: str):
 
 # HAMM – Counting Point Mutations
 # Problem ID: HAMM
-def hamming_distance(s: str, t: str) -> int:
+def hamming_distance(s: str, t: str) -- int:
     """
     Rosalind 'HAMM' – Counting Point Mutations
 
@@ -149,7 +149,7 @@ def hamming_distance(s: str, t: str) -> int:
 
 # PROT – Translating RNA into Protein
 # Problem ID: PROT
-def rna_to_protein(rna: str) -> str:
+def rna_to_protein(rna: str) -- str:
     """
     Rosalind 'PROT' – Translating RNA into Protein
 
@@ -214,3 +214,111 @@ def motif_substring_locations(s: str, t: str):
         if s[i:i+len_t] == t:
             positions.append(i + 1)  # 1-based
     return positions
+
+    # PRTM – Calculating Protein Mass
+# Problem ID: PRTM
+def protein_mass(protein: str) -- float:
+    """
+    Rosalind 'PRTM' – Calculating Protein Mass
+
+    Input:
+        protein (str): A protein string (amino acids in one-letter code).
+
+    Return:
+        float: Total monoisotopic mass of the protein.
+    """
+    masses = {
+        "A": 71.03711,
+        "C": 103.00919,
+        "D": 115.02694,
+        "E": 129.04259,
+        "F": 147.06841,
+        "G": 57.02146,
+        "H": 137.05891,
+        "I": 113.08406,
+        "K": 128.09496,
+        "L": 113.08406,
+        "M": 131.04049,
+        "N": 114.04293,
+        "P": 97.05276,
+        "Q": 128.05858,
+        "R": 156.10111,
+        "S": 87.03203,
+        "T": 101.04768,
+        "V": 99.06841,
+        "W": 186.07931,
+        "Y": 163.06333,
+    }
+    total = 0.0
+    for aa in protein:
+        total += masses.get(aa, 0.0)
+    return total
+
+
+# REVP – Locating Restriction Sites
+# Problem ID: REVP
+def reverse_palindromes(dna: str):
+    """
+    Rosalind 'REVP' – Locating Restriction Sites
+
+    Input:
+        dna (str): A DNA string.
+
+    Return:
+        list[tuple[int,int]]: List of (position, length) pairs where:
+            - position is 1-based index in dna
+            - length is between 4 and 12 (inclusive), even
+            - substring is a reverse palindrome (equals its reverse complement)
+    """
+    def _revcomp(seq: str) -> str:
+        comp = {"A": "T", "T": "A", "C": "G", "G": "C"}
+        return "".join(comp[b] for b in reversed(seq))
+
+    n = len(dna)
+    sites = []
+    for i in range(n):
+        for length in range(4, 13, 2):  # 4,6,8,10,12
+            j = i + length
+            if j > n:
+                continue
+            substring = dna[i:j]
+            if substring == _revcomp(substring):
+                # positions are 1-based
+                sites.append((i + 1, length))
+    return sites
+
+
+# TRAN – Transitions and Transversions
+# Problem ID: TRAN
+def transition_transversion_ratio(s1: str, s2: str) -- float:
+    """
+    Rosalind 'TRAN' – Transitions and Transversions
+
+    Input:
+        s1 (str), s2 (str): Two DNA strings of equal length.
+
+    Return:
+        float: Ratio (#transitions / #transversions).
+               If there are 0 transversions, returns float('inf').
+    """
+    purines = {"A", "G"}
+    pyrimidines = {"C", "T"}
+
+    transitions = 0
+    transversions = 0
+
+    for a, b in zip(s1, s2):
+        if a == b:
+            continue
+        # different
+        if (a in purines and b in purines) or (a in pyrimidines and b in pyrimidines):
+            transitions += 1
+        else:
+            transversions += 1
+
+    if transversions == 0:
+        # avoid division by zero; Rosalind never gives this case,
+        # but we handle it gracefully.
+        return float("inf")
+
+    return transitions / transversions
